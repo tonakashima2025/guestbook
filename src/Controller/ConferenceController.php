@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Conference;
+use App\Repository\CommentRepository;
 use App\Repository\ConferenceRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,8 +13,8 @@ use Twig\Environment;
 
 class ConferenceController extends AbstractController
 {
-    // #[Route('/', name: 'homepage')]
-    #[Route('/hello/{name}', name: 'homepage')]
+    #[Route('/', name: 'homepage')]
+    // #[Route('/hello/{name}', name: 'homepage')]
     // public function index(): Response
     // public function index(Request $request): Response
     // public function index(string $name = ''): Response
@@ -42,4 +44,14 @@ class ConferenceController extends AbstractController
                 'conferences' => $conferenceRepository->findAll(),
         ]));
     }
+
+    #[Route('/conference/{id}', name: 'conference')]
+    public function show(Environment $twig, Conference $conference, CommentRepository $commentRepository): Response
+    {
+        return new Response($twig->render('conference/show.html.twig', [
+            'conference' => $conference,
+            'comments' => $commentRepository->findBy(['conference' => $conference], ['createdAt' => 'DESC']),
+        ]));
+    }
+
 }
